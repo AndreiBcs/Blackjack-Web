@@ -41,19 +41,17 @@ newGameButton.addEventListener("click",()=>{
 playButton.addEventListener("click",()=>{
     const betAmount=parseInt(betAmountInput.value);
     if(balance<=0){
-        alert("Game over!");
         disableButtons();
         newGameButton.style.border="2px solid red";
         return;
     }
     if(betAmount>balance){
-        alert("Insufficient balance!");
         betAmountInput.value=0;
         betAmountInput.style.border="2px solid red";
         return;
     }
     else if(betAmount<=0){
-        alert("Please enter a valid bet amount!");
+        betAmountInput.value=0;
         betAmountInput.style.border="2px solid red";
         return;
     }
@@ -91,10 +89,8 @@ function updateUI(){
     dealerTotal.textContent=`${calculateTotal(dealerHand)}`;
     playerTotal.textContent=`${calculateTotal(playerHand)}`;
     if(calculateTotal(playerHand)===21){
-        alert("You win!");
         disableButtons();
     }else if(calculateTotal(playerHand)>21){
-        alert("You lost!");
         disableButtons();
     }else{
         hitButton.disabled=false;
@@ -106,13 +102,11 @@ function hitCard(){
     playerHand.push(deck.pop());
     updateUI();
     if(calculateTotal(playerHand)>21){
-        alert("You lost!");
         balance-=parseInt(betAmountInput.value);
         balanceDisplay.textContent=`Balance: $${balance}`;
         disableButtons();
     }
     else if(calculateTotal(playerHand)===21){
-        alert("You win!");
         balance+=parseInt(betAmountInput.value)*2;
         balanceDisplay.textContent=`Balance: $${balance}`;
         disableButtons();
@@ -126,15 +120,12 @@ function stand(){
     const playerTotalValue=calculateTotal(playerHand);
     const dealerTotalValue=calculateTotal(dealerHand);
     if(dealerTotalValue>21||playerTotalValue>dealerTotalValue){
-        alert("You win!");
         balance+=parseInt(betAmountInput.value)*2;
         balanceDisplay.textContent=`Balance: $${balance}`;
     }else if(playerTotalValue<dealerTotalValue){
-        alert("You lost!");
         balance-=parseInt(betAmountInput.value);
         balanceDisplay.textContent=`Balance: $${balance}`;
     }else{
-        alert("It's a tie!");
         balance+=parseInt(betAmountInput.value);
         balanceDisplay.textContent=`Balance: $${balance}`;
     }
