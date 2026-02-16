@@ -13,6 +13,7 @@ let playerHand=[];
 let dealerHand=[];
 let balance=1000;
 let initialCheck=true;
+let currentBet = 0;
 hitButton.disabled=true;
 standButton.disabled=true;
 window.onload=()=>{
@@ -31,12 +32,14 @@ function createDeck(){
         }
     }
 }
+
 function shuffleDeck(){
     for(let i=deck.length-1;i>0;i--){
         const j=Math.floor(Math.random()*(i+1));
         [deck[i],deck[j]]=[deck[j],deck[i]];
     }
 }
+
 betAmountInput.addEventListener("input", function() {
   this.value = this.value.replace(/\D/g, "");      // remove non-digits
   this.value = this.value.replace(/^0+/, "");      // remove all leading zeros
@@ -88,8 +91,13 @@ function checkBalance(){
 }
 
 function verifyBet(){
-    const betAmount = parseInt(betAmountInput.value, 10);
-    if (Number.isNaN(betAmount) || betAmount <= 0 || betAmount > balance) {
+    const betAmount=parseInt(betAmountInput.value, 10);
+    if(Number.isNaN(betAmount) || betAmount<=0){
+        betAmountInput.value=0;
+        betAmountInput.style.border="2px solid red";
+        return false;
+    }
+    if(betAmount>balance){
       betAmountInput.value = 0;
       betAmountInput.style.border = "2px solid red";
       return false;
@@ -97,12 +105,12 @@ function verifyBet(){
     else{
         betAmountInput.style.border="2px solid rgb(204, 207, 16)";
         balance-=betAmount;
+        currentBet = betAmount;
         balanceDisplay.textContent=`Balance: $${balance}`;
         return true;
-    }
-}
+    }};
 
-function updateUI(){
+    function updateUI(){
     dealerCards.innerHTML="";
     playerCards.innerHTML="";
 
@@ -122,13 +130,13 @@ function updateUI(){
     playerTotal.textContent=`${calculateTotal(playerHand)}`;
 
     if(initialCheck){
+        initialCheck = false;
         if(playerHand.length===2 && calculateTotal(playerHand)===21){
             stand();
         }else{
             hitButton.disabled=false;
             standButton.disabled=false;
-        }   
-        initialCheck=false;
+        }
     }
 }
 
@@ -150,6 +158,7 @@ function hitCard(){
     }
     updateUI();
 }
+
 function stand(){
     while(calculateTotal(dealerHand)<17){
         dealerHand.push(deck.pop());
@@ -177,7 +186,7 @@ function checkWin(){
 }
 
 function handleResult(result){
-    const bet = parseInt(betAmountInput.value,10);
+    const bet = (Number.isFinite(currentBet) && currentBet>0) ? currentBet : parseInt(betAmountInput.value, 10);
     switch(result){
         case "player-win":
                 balance += bet * 2;
@@ -206,6 +215,7 @@ function handleResult(result){
     }else{
         balanceDisplay.textContent=`Balance: $${balance}`;
     }
+    currentBet = 0;
 }
 
 function calculateTotal(hand){
